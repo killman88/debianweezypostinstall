@@ -15,10 +15,10 @@ VERSION="1.62"
 #-----------------------------------------------------------------------------
 
 # Fichier sources.list de référence
-SOURCES_LIST="https://github.com/killman88/debianweezypostinstall/blob/master/source.list-debianweezy"
+SOURCES_LIST="https://github.com/killman88/debianweezypostinstall/raw/master/source.list-debianweezy"
 
 # Ajouter la liste de vos logiciels séparés par des espaces
-LISTE="build-essential make checkinstall gwibber"
+LISTE="build-essential make checkinstall most gwibber"
 
 # Theme GTK: Equinox +
 LISTE=$LISTE" conky-all"
@@ -27,7 +27,7 @@ EQUINOX_THEME_VERSION="1.50"
 FAENZA_VERSION="0.9.2"
 
 # GStreamer: la totale
-LISTE=$LISTE" "`apt-cache search gstreamer | awk '{ print $1 }' | grep ^gstreamer | xargs -eol`
+#LISTE=$LISTE" "`apt-cache search gstreamer | awk '{ print $1 }' | grep ^gstreamer | xargs -eol`
 
 # Terminator
 LISTE=$LISTE" terminator"
@@ -39,7 +39,7 @@ LISTE=$LISTE" chromium-browser chromium-browser-l10n flashplugin-nonfree"
 LISTE=$LISTE" filezilla"
 
 # Dropbox (pre-requis)
-LISTE=$LISTE" libnautilus-extension-dev docutils-common libnotify-dev python-docutils"
+LISTE=$LISTE" libnautilus-extension-dev docutils-common libnotify-dev"
 DROPBOX_VERSION="0.6.7"
 
 # Multimedia: Vlc + ffmpeg
@@ -65,7 +65,7 @@ TEXTADEPT_VERSION="3.9"
 #-------------------
 USERNAME="sebastien"
 HOME_PATH=`grep $USERNAME /etc/passwd | cut -d: -f6`
-APT_GET="apt-get -q -y --force-yes"
+APT_GET="apt-get -f -q -y --force-yes"
 WGET="wget --no-check-certificate"
 DATE=`date +"%Y%m%d%H%M%S"`
 LOG_FILE="/tmp/debianweezypostinstall-$DATE.log"
@@ -149,22 +149,21 @@ displayandexec "Installation clés du dépôt Dotdeb" "$WGET -O - http://www.dot
 displayandexec "Installation clés du dépôt Google" "$WGET -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
 
 # Debian multimedia
-displayandexec "Installation clés du dépôt Debian Multimedia" "$APT_GET update && $APT_GET install debian-multimedia-keyring"
+displayandexec "Installation clés du dépôt Debian Multimedia" "wget http://www.dotdeb.org/dotdeb.gpg && cat dotdeb.gpg | apt-key add -;apt-get -y -f --force-yes install debian-multimedia-keyring && apt-get update"
 
 # Mise a jour des depots
 #-----------------------
 
 displaytitle "-- Mise à jour du système"
 
-displayandexec "Mise à jour de la liste des dépots" $APT_GET update
-displayandexec "Mise à jour des logiciels" $APT_GET upgrade
+displayandexec "Mise à jour de la liste des dépots" "$APT_GET update"
+displayandexec "Mise à jour des logiciels" "$APT_GET upgrade"
 
 # Installation des logiciels
 #---------------------------
 
 displaytitle "-- Installation des logiciels suivants: $LISTE"
-
-displayandexec "Installation des logiciels" $APT_GET install $LISTE
+displayandexec "Installation des logiciels" "$APT_GET install $LISTE"
 
 # Installation de gitso
 #--------------------------
@@ -210,19 +209,35 @@ displayandexec "Téléchargement du fond d'écran" $WGET -O /usr/share/backgroun
 displayandexec "Installation du fond d'écran" "su $USERNAME -c 'gconftool-2 -t string -s /desktop/gnome/background/picture_filename /usr/share/backgrounds/wallpaper.jpg'"
 
 # Conkyc
+
 # Theme LUA 2011 - http://gnome-look.org/content/show.php?content=141411
-displayandexec "Téléchargement théme Conky" $WGET http://gnome-look.org/CONTENT/content-files/141411-Conky-lua%202011%20next%20generation.tar.gz
-displayandexec "Décompression théme Conky" tar zxvf "141411-Conky-lua\ 2011\ next\ generation.tar.gz"
-displayandexec "Création des répertoires Conky" "mkdir -p $HOME_PATH/.lua ; mkdir -p $HOME_PATH/.lua/scripts ; mkdir -p $HOME_PATH/.conky"
-displayandexec "Installation théme Conky" "cp 'Conky-lua 2011 next generation/Debian/logo.png' $HOME_PATH/.conky ; cp 'Conky-lua 2011 next generation/Debian/clock_rings.lua' $HOME_PATH/.lua/scripts ; cp 'Conky-lua 2011 next generation/Debian/conkyrc' $HOME_PATH/.conkyrc"
-rm -rf "141411-Conky-lua 2011 next generation.tar.gz" "Conky-lua\ 2011\ next\ generation"
-chown -fR $USERNAME:$USERNAME $HOME_PATH/.lua
+#displayandexec "Téléchargement théme Conky" $WGET http://gnome-look.org/CONTENT/content-files/141411-Conky-lua%202011%20next%20generation.tar.gz
+#displayandexec "Décompression théme Conky" tar zxvf "141411-Conky-lua\ 2011\ next\ generation.tar.gz"
+#displayandexec "Création des répertoires Conky" "mkdir -p $HOME_PATH/.lua ; mkdir -p $HOME_PATH/.lua/scripts ; mkdir -p $HOME_PATH/.conky"
+#displayandexec "Installation théme Conky" "cp 'Conky-lua 2011 next generation/Debian/logo.png' $HOME_PATH/.conky ; cp 'Conky-lua 2011 next generation/Debian/clock_rings.lua' $HOME_PATH/.lua/scripts ; cp 'Conky-lua 2011 next generation/Debian/conkyrc' $HOME_PATH/.conkyrc"
+#rm -rf "141411-Conky-lua 2011 next generation.tar.gz" "Conky-lua\ 2011\ next\ generation"
+#chown -fR $USERNAME:$USERNAME $HOME_PATH/.lua
+#chown -fR $USERNAME:$USERNAME $HOME_PATH/.conky
+#chown -fR $USERNAME:$USERNAME $HOME_PATH/.conkyrc
+#displayandexec "Lancement de Conky" "/usr/bin/conky &"
+
+#Installation de conky theme orange
+displayandexec "Téléchargement théme Conky" $WGET http://gnome-look.org/CONTENT/content-files/137503-conky_orange.zip
+displayandexec "Décompression théme Conky" unzip 137503-conky_orange.zip
+displayandexec "Création des répertoires Conky" "mkdir $HOME_PATH/.conky/; cp conky_orange/* $HOME_PATH/.conky/; ln -s $HOME_PATH/.conky/conkyrc_orange $HOME_PATH/.conkyrc"
+# lancement de conky au demarrage de la session
+cat << EOF 1>> $HOME_PATH/.config/autostart/conky.desktop
+[Desktop Entry]
+Name=conky
+Exec=/usr/bin/conky -p 50 -c $HOME_PATH/.conky/conkyrc_orange
+Terminal=false
+Type=Application
+StartupNotify=false
+EOF
+chown $USERNAME:$USERNAME $HOME_PATH/.config/autostart/conky.desktop
 chown -fR $USERNAME:$USERNAME $HOME_PATH/.conky
 chown -fR $USERNAME:$USERNAME $HOME_PATH/.conkyrc
-displayandexec "Lancement de Conky" "/usr/bin/conky &"
 
-# Connect Spotify to Chromium
-#displayandexec "Configuration de Chromium pour ouvrir les lien Spotify" "gconftool-2 -t string -s /desktop/gnome/url-handlers/spotify/command '/usr/bin/spotify -uri %s' ; gconftool-2 -t bool -s /desktop/gnome/url-handlers/spotify/needs_terminal false ; gconftool-2 -t bool -s /desktop/gnome/url-handlers/spotify/enabled true"
 
 # Install TextAdept
 if [ `arch` == "x86_64" ]; then
@@ -238,19 +253,23 @@ export MOZ_DISABLE_PANGO=1
 EOF
 source $HOME_PATH/.bashrc
 
-# Ajout de $USERNAME au sudoers
-displayandexec "Ajout de $USERNAME au sudoers file" echo "$USERNAME ALL=(ALL:ALL) ALL" >> /etc/sudoers
-
 ############################
 #
-# Specifs Asus 1005 HA-H
+# Specifs eee-pc Asus 1005 HA-H
 # for fn keys
 #
 ###########################
 #displaytitle "-- Custo specifique Asus 1005-HA H"
 #displayandexec "Backup de /etc/default/grub" "cp /etc/default/grub /etc/default/grub.bak"
-#displayandexec "Prise en charge fn keys" "sed -i s/GRUB_CMDLINE_LINUX_DEFAULT\=\"quiet\"/GRUB_CMDLINE_LINUX_DEFAULT\=\"quiet\ splash\ acpi=Linux\"/ /etc/default/grub"
+#displayandexec "Prise en charge fn keys" "sed -i s/GRUB_CMDLINE_LINUX_DEFAULT\=\"quiet\"/GRUB_CMDLINE_LINUX_DEFAULT\=\"quiet\ splash\ acpi=Linux\"/ /etc/default/grub && update-grub"
 
+# Installation du paquet wifi non libre pour le support des chipsets wifi intel
+if [[ `lspci | grep -i 'network.*intel' | egrep -i '3945|4965|5000'` ]]
+then
+	displayandexec "Binary firmware for Intel Wireless 3945, 4965 and 5000-series cards" "$APT_GET install firmware-iwlwifi"
+else
+	echo -e "Aucun chipset Wifi INTEL detecte!\n"
+fi
 
 echo ""
 echo "##############################################################################"
